@@ -1,0 +1,28 @@
+{
+  "name": "moo-client-ts",
+  "version": "0.1.0",
+  "description": "A utility client for MOO servers written in TypeScript",
+  "keywords": [
+    "MOO",
+    "LambdaMOO",
+    "ToastStunt"
+  ],
+  "author": "Malbios",
+  "license": "ISC",
+  "bugs": "https://github.com/blinkdog/telnet-stream/issues",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "npm run clean && npx tsc"
+  },
+  "dependencies": {
+    "@types/node": "^20.12.8",
+    "net": "^1.0.2",
+    "telnet-stream": "^1.1.0",
+    "typescript": "^5.4.5"
+  },
+  "devDependencies": {
+    "rimraf": "^5.0.5"
+  }
+}

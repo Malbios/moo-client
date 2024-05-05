@@ -1,0 +1,1 @@
+export const MCP_AUTH_KEY = 1357924680;
