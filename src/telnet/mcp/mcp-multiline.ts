@@ -1,14 +1,20 @@
 import { MCP_AUTH_KEY } from './constants';
 
 import {
-    MultilineResult,
-    MultilineResultHandler,
-    TelnetMessageSender
+    TelnetMessageSender,
+    ConnectionStateChanger,
+    ConnectionState
 } from "../interfaces";
 
 import { McpMessageHandler } from "./mcp-message-handler";
 
 // TODO: make more generic than simpleedit-content
+
+class MultilineResult {
+    public reference: string = '';
+    public name: string = '';
+    public lines: string[] = [];
+}
 
 class MultilineData {
     private dataTag: string;
@@ -57,12 +63,12 @@ export class McpMultilineHandler extends McpMessageHandler {
 
     private memory: MultilineData[] = [];
 
-    private onMultilineResultHandler: MultilineResultHandler;
+    private connectionStateChanger: ConnectionStateChanger;
 
-    constructor(sender: TelnetMessageSender, onMultilineResult: MultilineResultHandler) {
+    constructor(sender: TelnetMessageSender, connectionStateChanger: ConnectionStateChanger) {
         super(sender);
         
-        this.onMultilineResultHandler = onMultilineResult;
+        this.connectionStateChanger = connectionStateChanger;
     }
     
     public handle(message: string): boolean {
@@ -136,7 +142,10 @@ export class McpMultilineHandler extends McpMessageHandler {
 
         existingMultilineData.finish();
 
-        this.onMultilineResultHandler.onMultilineResult(existingMultilineData.getData());
+        let multilineData = existingMultilineData.getData();
+        let stateData = { reference: multilineData.reference,
+            name: multilineData.name, lines: multilineData.lines };
+        this.connectionStateChanger.changeState(ConnectionState.multilineResult, stateData);
 
         return true;
     }

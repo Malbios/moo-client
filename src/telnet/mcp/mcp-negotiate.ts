@@ -1,5 +1,5 @@
 import { MCP_AUTH_KEY } from './constants';
-import { ConnectedHandler, TelnetMessageSender } from '../interfaces';
+import { ConnectionState, ConnectionStateChanger, TelnetMessageSender } from '../interfaces';
 
 import { McpMessageHandler } from "./mcp-message-handler";
 
@@ -49,8 +49,10 @@ export class McpNegotiationEndHandler extends McpNegotiationMessageHandler {
     protected messagePattern = `^#\\$#mcp-negotiate-end ${MCP_AUTH_KEY}$`;
     protected response = `mcp-negotiate-end ${MCP_AUTH_KEY}`;
 
-    constructor(telnetMessageSender: TelnetMessageSender, connectedHandler: ConnectedHandler) {
+    constructor(telnetMessageSender: TelnetMessageSender, connectionStateChanger: ConnectionStateChanger) {
         super(telnetMessageSender);
-        this.onHandled = () => { connectedHandler.onConnected(); };
+        this.onHandled = () => {
+            connectionStateChanger.changeState(ConnectionState.connected);
+        };
     }
 }

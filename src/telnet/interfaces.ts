@@ -2,19 +2,26 @@ export interface TelnetMessageSender {
     send(message: string): void;
 }
 
-export interface ConnectedHandler {
-    onConnected: () => void;
-}
-
-export interface MultilineResultHandler {
-    onMultilineResult: (result: MultilineResult) => void;
+export interface ConnectionStateChanger {
+    changeState(newState: ConnectionState, data?: any): void;
 }
 
 export interface MessageHandler {
     handle(message: string): boolean;
 }
 
-export interface MultilineResult {
+export enum ConnectionState {
+    undefined,
+    connected,
+    multilineResult,
+    error
+}
+
+export interface ErrorStateData {
+    message: string;
+}
+
+export interface MultilineResultStateData {
     reference: string;
     name: string;
     lines: string[];

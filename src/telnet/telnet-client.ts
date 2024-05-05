@@ -3,29 +3,42 @@ import { TelnetSocket } from "telnet-stream";
 
 import {
     TelnetMessageSender,
-    ConnectedHandler,
-    MultilineResultHandler,
-    MultilineResult
+    ConnectionStateChanger,
+    ConnectionState
 } from './interfaces';
 
-import { getMessageHandlers } from './mcp/mcp';
+import { getMessageHandlers as getMcpMessageHandlers } from './mcp/mcp';
+import { getMessageHandlers as getCommonMessageHandlers } from './errors/handlers';
 
-export class TelnetClient implements TelnetMessageSender, ConnectedHandler, MultilineResultHandler {
+export class TelnetClient implements TelnetMessageSender, ConnectionStateChanger {
     private socket: Socket;
     private telnetSocket: TelnetSocket;
 
     private logging: boolean = false;
+    private state: ConnectionState = ConnectionState.undefined;
+    private stateData: any;
 
-    public onConnected: () => void;
-    public onMultilineResult: (result: MultilineResult) => void;
-
-    private messageHandlers = getMessageHandlers(this, this, this);
+    private messageHandlers = getCommonMessageHandlers(this).concat(getMcpMessageHandlers(this, this));
 
     public constructor() {
         this.socket = new Socket();
         this.telnetSocket = new TelnetSocket(this.socket);
-        this.onConnected = () => { };
-        this.onMultilineResult = (_: MultilineResult) => { };
+    }
+
+    public changeState(newState: ConnectionState, stateData?: any): void {
+        this.state = newState;
+
+        if (stateData) {
+            this.stateData = stateData;
+        }
+    }
+
+    public getState(): ConnectionState {
+        return this.state;
+    }
+
+    public getStateData(): any {
+        return this.stateData;
     }
 
     private log(message: string) {

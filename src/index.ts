@@ -1,19 +1,9 @@
-import { TelnetClient } from "./telnet/telnet-client";
+import { TelnetClient } from './telnet/telnet-client';
+import { ConnectionState } from './telnet/interfaces';
+import { VerbData } from './verb-data';
 
 function delay(milliseconds: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, milliseconds));
-}
-
-export class VerbData {
-    public reference: string;
-    public name: string;
-    public code: string[];
-
-    constructor(reference: string, name: string, code: string[]) {
-        this.reference = reference;
-        this.name = name;
-        this.code = code;
-    }
 }
 
 export class MooClient {
@@ -38,20 +28,44 @@ export class MooClient {
     public async getVerbData(object: string, verb: string): Promise<VerbData> {
         let verbData: VerbData | null = null;
 
-        this.telnetClient.onConnected = () => {
-            this.telnetClient.send(`@edit ${object}:${verb}`);
-        };
-
-        this.telnetClient.onMultilineResult = result => {
-            verbData = new VerbData(result.reference, result.name, result.lines);
-            this.telnetClient.send('@quit');
-        };
-
         this.telnetClient.connect(this.serverAddress, this.serverPort,
             this.serverUsername, this.serverPassword);
 
-        while (!verbData) {
-            await delay(1);
+        let finished = false;
+
+        while (!finished) {
+            switch (this.telnetClient.getState()) {
+                case ConnectionState.undefined: {
+                    await delay(1);
+                    break;
+                }
+
+                case ConnectionState.connected: {
+                    this.telnetClient.changeState(ConnectionState.undefined);
+                    this.telnetClient.send(`@edit ${object}:${verb}`);
+                    break;
+                }
+
+                case ConnectionState.error: {
+                    this.telnetClient.send('@quit');
+                    await delay(100);
+                    throw Error(this.telnetClient.getStateData().message);
+                }
+
+                case ConnectionState.multilineResult: {
+                    this.telnetClient.send('@quit');
+                    const stateData = this.telnetClient.getStateData();
+                    verbData = new VerbData(stateData.reference,
+                        stateData.name, stateData.lines);
+                    finished = true;
+                    await delay(100);
+                    break;
+                }
+            }
+        }
+
+        if (!verbData) {
+            return new VerbData('', '', []);
         }
 
         return verbData;

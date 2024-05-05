@@ -1,4 +1,4 @@
-import { ConnectedHandler, MultilineResultHandler, TelnetMessageSender } from "../interfaces";
+import { ConnectionStateChanger, MessageHandler, TelnetMessageSender } from "../interfaces";
 import { McpMultilineHandler } from "./mcp-multiline";
 
 import {
@@ -11,15 +11,14 @@ import {
 
 export function getMessageHandlers(
     telnetMessageSender: TelnetMessageSender,
-    connectedHandler: ConnectedHandler,
-    multilineResultHandler: MultilineResultHandler
-) {
+    connectionStateChanger: ConnectionStateChanger
+): MessageHandler[] {
     return [
         new McpNegotiateStartHandler(telnetMessageSender),
         new McpNegotiationNegotiateHandler(telnetMessageSender),
         new McpNegotiationCordHandler(telnetMessageSender),
         new McpNegotiationSimpleEditHandler(telnetMessageSender),
-        new McpNegotiationEndHandler(telnetMessageSender, connectedHandler),
-        new McpMultilineHandler(telnetMessageSender, multilineResultHandler)
+        new McpNegotiationEndHandler(telnetMessageSender, connectionStateChanger),
+        new McpMultilineHandler(telnetMessageSender, connectionStateChanger)
     ];
 }
