@@ -9,20 +9,27 @@
   ],
   "author": "Malbios",
   "license": "ISC",
-  "bugs": "https://github.com/blinkdog/telnet-stream/issues",
+  "bugs": "https://github.com/Malbios/moo-client-ts/issues",
+  "repository": "https://github.com/Malbios/moo-client-ts",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "clean": "rimraf dist",
-    "build": "npm run clean && npx tsc"
+    "build": "npm run clean && npx tsc",
+    "prepublish": "npm run build && npm run test",
+    "test": "ts-node node_modules/jasmine/bin/jasmine --config=jasmine.json"
   },
   "dependencies": {
     "@types/node": "^20.12.8",
     "net": "^1.0.2",
     "telnet-stream": "^1.1.0",
-    "typescript": "^5.4.5"
+    "yaml": "^2.4.2"
   },
   "devDependencies": {
-    "rimraf": "^5.0.5"
+    "@types/jasmine": "^5.1.4",
+    "jasmine": "^5.1.0",
+    "rimraf": "^5.0.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
   }
 }
