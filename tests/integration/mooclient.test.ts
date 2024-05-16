@@ -1,21 +1,20 @@
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
+import { fail } from 'assert';
+import { expect } from 'chai';
 
 import MooClient from '../../src/index';
 import { getServerCredentials } from '../test-utils/secrets';
-import { TelnetClient } from '../../src/telnet/telnet-client';
-
-const expect = chai.expect
-
-chai.use(chaiAsPromised);
 
 function getDefaultMooClient(): MooClient {
     const credentials = getServerCredentials();
 
-    return new MooClient(new TelnetClient(), credentials.serverAddress, credentials.serverPort, credentials.serverUsername, credentials.serverPassword);
+    return MooClient.create(credentials.serverAddress, credentials.serverPort, credentials.serverUsername, credentials.serverPassword);
 }
 
 describe('MooClient integration tests', () => {
+    it('should be created with no errors', () => {
+        getDefaultMooClient();
+    });
+
     it('should return expected verb data for given verb info', async () => {
         const client = getDefaultMooClient();
 
@@ -33,14 +32,24 @@ describe('MooClient integration tests', () => {
     it('should throw expected error for invalid object in verb info', async () => {
         const client = getDefaultMooClient();
 
-        await expect(client.getVerbData('DoesNotExist', 'test'))
-            .to.be.rejectedWith('I see no "DoesNotExist" here.');
+        try {
+            await client.getVerbData('DoesNotExist', 'test');
+            fail();
+        } catch (exception) {
+            const error = exception as Error;
+            expect(error.message).to.equal('I see no "DoesNotExist" here.');
+        }
     });
 
     it('should throw expected error for invalid verb in verb info', async () => {
         const client = getDefaultMooClient();
 
-        await expect(client.getVerbData('me', 'DefinitelyDoesNotExist'))
-            .to.be.rejectedWith('That object does not define that verb.');
+        try {
+            await client.getVerbData('me', 'DefinitelyDoesNotExist');
+            fail();
+        } catch (exception) {
+            const error = exception as Error;
+            expect(error.message).to.equal('That object does not define that verb.');
+        }
     });
 });

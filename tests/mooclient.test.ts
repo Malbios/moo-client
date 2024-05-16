@@ -11,7 +11,7 @@ suite('MooClient unit tests', () => {
         const mockedTelnetClient = createMock<ITelnetClient>();
         const mockedTelnetClientInstance = instance(mockedTelnetClient);
 
-        new MooClient(mockedTelnetClientInstance, '', 0, '', '');
+        MooClient.create('', 0, '', '', mockedTelnetClientInstance);
     });
 
     test('should return verb code for a valid verb code request', async () => {
@@ -32,7 +32,7 @@ suite('MooClient unit tests', () => {
 
         const mockedTelnetClientInstance = instance(mockedTelnetClient);
 
-        const client = new MooClient(mockedTelnetClientInstance, 'server', 123, 'user', 'pass');
+        const client = MooClient.create('server', 123, 'user', 'pass', mockedTelnetClientInstance);
         const result = await client.getVerbData('me', 'test');
 
         verify(mockedTelnetClient.connect('server', 123, 'user', 'pass')).called();
@@ -61,7 +61,7 @@ suite('MooClient unit tests', () => {
 
         const mockedTelnetClientInstance = instance(mockedTelnetClient);
 
-        const client = new MooClient(mockedTelnetClientInstance, 'server', 123, 'user', 'pass');
+        const client = MooClient.create('server', 123, 'user', 'pass', mockedTelnetClientInstance);
 
         try {
             await client.getVerbData('me', 'DefinitelyDoesNotExist');
@@ -89,7 +89,7 @@ suite('MooClient unit tests', () => {
 
         const mockedTelnetClientInstance = instance(mockedTelnetClient);
 
-        const client = new MooClient(mockedTelnetClientInstance, 'server', 123, 'user', 'pass');
+        const client = MooClient.create('server', 123, 'user', 'pass', mockedTelnetClientInstance);
 
         try {
             await client.getVerbData('DoesNotExist', 'test');

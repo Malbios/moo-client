@@ -3,6 +3,7 @@ import { TelnetSocket } from 'telnet-stream';
 
 import {
     TelnetClient as ITelnetClient,
+    TelnetSocket as ITelnetSocket,
     TelnetMessageSender,
     ConnectionStateChanger,
     ConnectionState,
@@ -14,8 +15,7 @@ import { getMessageHandlers as getMcpMessageHandlers } from './mcp/mcp';
 import { getMessageHandlers as getCommonMessageHandlers } from './errors/handlers';
 
 export class TelnetClient implements ITelnetClient, TelnetMessageSender, ConnectionStateChanger {
-    private socket: Socket;
-    private telnetSocket: TelnetSocket;
+    private telnetSocket: ITelnetSocket;
 
     private logging = false;
     private state: ConnectionState = ConnectionState.undefined;
@@ -23,9 +23,16 @@ export class TelnetClient implements ITelnetClient, TelnetMessageSender, Connect
 
     private messageHandlers = getCommonMessageHandlers(this).concat(getMcpMessageHandlers(this, this));
 
-    public constructor() {
-        this.socket = new Socket();
-        this.telnetSocket = new TelnetSocket(this.socket);
+    private constructor(telnetSocket: ITelnetSocket) {
+        this.telnetSocket = telnetSocket;
+    }
+
+    public static create(telnetSocket?: ITelnetSocket): ITelnetClient {
+        if (!telnetSocket) {
+            return new TelnetClient(new TelnetSocket(new Socket()));
+        }
+
+        return new TelnetClient(telnetSocket);
     }
 
     public changeState(newState: ConnectionState, stateData?: ErrorStateData | VerbCodeStateData): void {
