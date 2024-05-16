@@ -1,4 +1,4 @@
-import { ConnectionState, ConnectionStateChanger, MessageHandler } from "../interfaces";
+import { ConnectionState, ConnectionStateChanger, ErrorCode, MessageHandler } from '../interfaces';
 
 export class ObjectNotFoundHandler implements MessageHandler {
     private connectionStateChanger: ConnectionStateChanger;
@@ -8,13 +8,13 @@ export class ObjectNotFoundHandler implements MessageHandler {
     }
 
     handle(message: string): boolean {
-        let match = message.match(/I see no \"([^\"]+)\" here\./);
+        const match = message.match(/I see no \"([^\"]+)\" here\./);
         if (!match) {
             return false;
         }
 
         this.connectionStateChanger.changeState(ConnectionState.error,
-            { code:'ObjectNotFound', message: `I see no "${match[1]}" here.` });
+            { code: ErrorCode.objectNotFound, message: `I see no "${match[1]}" here.` });
 
         return true;
     }

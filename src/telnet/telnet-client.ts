@@ -1,22 +1,25 @@
 import { Socket } from 'net';
-import { TelnetSocket } from "telnet-stream";
+import { TelnetSocket } from 'telnet-stream';
 
 import {
+    TelnetClient as ITelnetClient,
     TelnetMessageSender,
     ConnectionStateChanger,
-    ConnectionState
+    ConnectionState,
+    ErrorStateData,
+    VerbCodeStateData
 } from './interfaces';
 
 import { getMessageHandlers as getMcpMessageHandlers } from './mcp/mcp';
 import { getMessageHandlers as getCommonMessageHandlers } from './errors/handlers';
 
-export class TelnetClient implements TelnetMessageSender, ConnectionStateChanger {
+export class TelnetClient implements ITelnetClient, TelnetMessageSender, ConnectionStateChanger {
     private socket: Socket;
     private telnetSocket: TelnetSocket;
 
-    private logging: boolean = false;
+    private logging = false;
     private state: ConnectionState = ConnectionState.undefined;
-    private stateData: any;
+    private stateData: undefined | ErrorStateData | VerbCodeStateData;
 
     private messageHandlers = getCommonMessageHandlers(this).concat(getMcpMessageHandlers(this, this));
 
@@ -25,7 +28,7 @@ export class TelnetClient implements TelnetMessageSender, ConnectionStateChanger
         this.telnetSocket = new TelnetSocket(this.socket);
     }
 
-    public changeState(newState: ConnectionState, stateData?: any): void {
+    public changeState(newState: ConnectionState, stateData?: ErrorStateData | VerbCodeStateData): void {
         this.state = newState;
 
         if (stateData) {
@@ -37,7 +40,7 @@ export class TelnetClient implements TelnetMessageSender, ConnectionStateChanger
         return this.state;
     }
 
-    public getStateData(): any {
+    public getStateData(): undefined | ErrorStateData | VerbCodeStateData {
         return this.stateData;
     }
 
@@ -126,21 +129,21 @@ export class TelnetClient implements TelnetMessageSender, ConnectionStateChanger
         });
 
         this.telnetSocket.on('lookup', () => {
-            this.log(`<LOOKUP`);
+            this.log('<LOOKUP');
         })
 
         this.telnetSocket.on('timeout', () => {
-            this.log(`<TIMEOUT`);
+            this.log('<TIMEOUT');
         })
 
         this.telnetSocket.on('data', async buffer => {
-            let data = buffer.toString('utf8');
+            const data = buffer.toString('utf8');
 
-            let lines = data.split('\r\n');
-            for (let line of lines) {
+            const lines = data.split('\r\n');
+            for (const line of lines) {
                 this.log(`<DATA: '${line}'`);
 
-                for (let handler of this.messageHandlers) {
+                for (const handler of this.messageHandlers) {
                     if (handler.handle(line)) {
                         break;
                     }

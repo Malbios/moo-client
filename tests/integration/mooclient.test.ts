@@ -3,6 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 
 import MooClient from '../../src/index';
 import { getServerCredentials } from '../test-utils/secrets';
+import { TelnetClient } from '../../src/telnet/telnet-client';
 
 const expect = chai.expect
 
@@ -11,10 +12,10 @@ chai.use(chaiAsPromised);
 function getDefaultMooClient(): MooClient {
     const credentials = getServerCredentials();
 
-    return new MooClient(credentials.serverAddress, credentials.serverPort, credentials.serverUsername, credentials.serverPassword);
+    return new MooClient(new TelnetClient(), credentials.serverAddress, credentials.serverPort, credentials.serverUsername, credentials.serverPassword);
 }
 
-describe('MooClient Tests', () => {
+describe('MooClient integration tests', () => {
     it('should return expected verb data for given verb info', async () => {
         const client = getDefaultMooClient();
 

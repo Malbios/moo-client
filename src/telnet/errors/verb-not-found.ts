@@ -1,4 +1,4 @@
-import { ConnectionState, ConnectionStateChanger, MessageHandler } from "../interfaces";
+import { ConnectionState, ConnectionStateChanger, ErrorCode, MessageHandler } from '../interfaces';
 
 export class VerbNotFoundHandler implements MessageHandler {
     private connectionStateChanger: ConnectionStateChanger;
@@ -8,13 +8,13 @@ export class VerbNotFoundHandler implements MessageHandler {
     }
 
     handle(message: string): boolean {
-        let match = message.match(/That object does not define that verb\./);
+        const match = message.match(/That object does not define that verb\./);
         if (!match) {
             return false;
         }
 
         this.connectionStateChanger.changeState(ConnectionState.error,
-            { code:'VerbNotFound', message: "That object does not define that verb." });
+            { code: ErrorCode.verbNotFound, message: 'That object does not define that verb.' });
 
         return true;
     }
