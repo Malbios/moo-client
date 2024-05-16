@@ -19,7 +19,7 @@
     "clean:out": "rimraf ./dist",
     "rebuild": "npm run clean:out && npm run build",
     "build": "npx tsc",
-    "test-with-coverage": "npx nyc mocha",
+    "test-with-coverage": "npx nyc mocha --config .mocharc.prod.json",
     "test:mocha": "npx mocha",
     "lint": "npm run lint:fix",
     "lint:check": "npx eslint",
