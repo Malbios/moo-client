@@ -1,7 +1,12 @@
-import 'jasmine';
+import chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 
-import { MooClient } from '../dist/index';
-import { getServerCredentials } from '../helpers/secrets';
+import MooClient from '../src/index';
+import { getServerCredentials } from './test-utils/secrets';
+
+const expect = chai.expect
+
+chai.use(chaiAsPromised);
 
 function getDefaultMooClient(): MooClient {
     const credentials = getServerCredentials();
@@ -9,36 +14,32 @@ function getDefaultMooClient(): MooClient {
     return new MooClient(credentials.serverAddress, credentials.serverPort, credentials.serverUsername, credentials.serverPassword);
 }
 
-describe("MooClient Tests", async () => {
-    it("should return expected verb data for given verb info", async () => {
+describe('MooClient Tests', () => {
+    it('should return expected verb data for given verb info', async () => {
         const client = getDefaultMooClient();
 
-        // client.enableDebugging();
-        
+        //client.enableDebugging();
+
         const result = await client.getVerbData('me', 'test');
 
-        expect(result.reference).toBe('#131:test');
-        expect(result.name).toBe('ServiceAccount:test');
-        expect(result.code).toHaveSize(2);
-        expect(result.code[0]).toBe('"Usage: ;#131:test();";');
-        expect(result.code[1]).toBe('player:tell("test");');
+        expect(result.reference).to.equal('#129:test');
+        expect(result.name).to.equal('ServiceAccount:test');
+        expect(result.code).to.have.length(2);
+        expect(result.code[0]).to.equal('"Usage: test()";');
+        expect(result.code[1]).to.equal('player:tell("test");');
     });
-    it("should throw expected error for invalid object in verb info", async () => {
+
+    it('should throw expected error for invalid object in verb info', async () => {
         const client = getDefaultMooClient();
 
-        // client.enableDebugging();
-
-        const promise = client.getVerbData('DoesNotExist', 'test');
-
-        await expectAsync(promise).toBeRejectedWithError('I see no "DoesNotExist" here.');
+        await expect(client.getVerbData('DoesNotExist', 'test'))
+            .to.be.rejectedWith('I see no "DoesNotExist" here.');
     });
-    it("should throw expected error for invalid verb in verb info", async () => {
+
+    it('should throw expected error for invalid verb in verb info', async () => {
         const client = getDefaultMooClient();
 
-        // client.enableDebugging();
-
-        const promise = client.getVerbData('me', 'DefinitelyDoesNotExist');
-
-        await expectAsync(promise).toBeRejectedWithError('That object does not define that verb.');
+        await expect(client.getVerbData('me', 'DefinitelyDoesNotExist'))
+            .to.be.rejectedWith('That object does not define that verb.');
     });
 });

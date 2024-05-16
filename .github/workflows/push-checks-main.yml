@@ -1,0 +1,17 @@
+name: Automated Checks (main)
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  lint:
+    uses: ./.github/workflows/check-lint.yml
+  
+  test:
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
+    uses: ./.github/workflows/check-tests.yml

@@ -1,5 +1,12 @@
+.github
 .vscode/
+.nyc_output/
+reports/
 tests/
-helpers/
+.gitattributes
+.gitignore
+.mocharc.json
+.nycrc.json
+eslint.config.mjs
+tsconfig.json
 secret.yml
-jasmine.json

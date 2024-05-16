@@ -1,5 +1,27 @@
 {
     "files.exclude": {
-        "dist/": true
-    }
+        "dist": true,
+        ".nyc_output": true
+    },
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "explicit"
+    },
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
+    "eslint.validate": [
+        "typescript"
+    ],
+    "eslint.workingDirectories": [
+        "./"
+    ],
+    "eslint.experimental.useFlatConfig": true,
+    "eslint.options": {
+        "overrideConfigFile": "eslint.config.mjs"
+    },
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "[github-actions-workflow]": {
+        "editor.tabSize": 2
+    },
+    "cmake.configureOnOpen": false,
+    "mochaExplorer.debuggerConfig": "Debug Mocha Tests"
 }
