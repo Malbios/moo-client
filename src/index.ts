@@ -1,20 +1,21 @@
-import { TelnetClient } from './telnet/telnet-client';
-import { ConnectionState } from './telnet/interfaces';
-import { VerbData } from './verb-data';
+import { TelnetClient, ConnectionState, ErrorStateData, VerbCodeStateData } from './telnet/interfaces';
+import { VerbData } from './models';
 
 function delay(milliseconds: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, milliseconds));
 }
 
 export default class MooClient {
-    private telnetClient = new TelnetClient();
+    private telnetClient;
 
     private serverAddress: string;
     private serverPort: number;
     private serverUsername: string;
     private serverPassword: string;
 
-    constructor(serverAddress: string, serverPort: number, serverUsername: string, serverPassword: string) {
+    constructor(telnetClient: TelnetClient, serverAddress: string, serverPort: number, serverUsername: string, serverPassword: string) {
+        this.telnetClient = telnetClient;
+
         this.serverAddress = serverAddress;
         this.serverPort = serverPort;
         this.serverUsername = serverUsername;
@@ -48,17 +49,22 @@ export default class MooClient {
 
                 case ConnectionState.error: {
                     this.telnetClient.send('@quit');
-                    await delay(100);
-                    throw Error(this.telnetClient.getStateData().message);
+
+                    const errorStateData = this.telnetClient.getStateData() as ErrorStateData;
+                    throw Error(errorStateData?.message ?? 'unexpected error with no message');
                 }
 
                 case ConnectionState.multilineResult: {
                     this.telnetClient.send('@quit');
-                    const stateData = this.telnetClient.getStateData();
-                    verbData = new VerbData(stateData.reference,
-                        stateData.name, stateData.lines);
+
+                    const stateData = this.telnetClient.getStateData() as VerbCodeStateData;
+                    if (!stateData) {
+                        throw Error('unexpected error with no verb data');
+                    }
+
+                    verbData = new VerbData(stateData.reference, stateData.name, stateData.lines);
                     finished = true;
-                    await delay(100);
+
                     break;
                 }
             }

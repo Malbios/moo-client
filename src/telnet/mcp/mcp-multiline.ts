@@ -4,15 +4,15 @@ import {
     TelnetMessageSender,
     ConnectionStateChanger,
     ConnectionState
-} from "../interfaces";
+} from '../interfaces';
 
-import { McpMessageHandler } from "./mcp-message-handler";
+import { McpMessageHandler } from './mcp-message-handler';
 
 // TODO: make more generic than simpleedit-content
 
 class MultilineResult {
-    public reference: string = '';
-    public name: string = '';
+    public reference = '';
+    public name = '';
     public lines: string[] = [];
 }
 
@@ -88,17 +88,17 @@ export class McpMultilineHandler extends McpMessageHandler {
     }
 
     private handleStart(message: string): boolean {
-        let regex = new RegExp(this.regexPattern_multiline_start, '');
-        let match = regex.exec(message);
+        const regex = new RegExp(this.regexPattern_multiline_start, '');
+        const match = regex.exec(message);
         if (!match) {
             return false;
         }
 
-        let reference = match[1];
-        let name = match[2];
-        let dataTag = match[3];
+        const reference = match[1];
+        const name = match[2];
+        const dataTag = match[3];
 
-        let existingMultilineData = this.memory.find(x => x.getDataTag() === dataTag);
+        const existingMultilineData = this.memory.find(x => x.getDataTag() === dataTag);
         if (existingMultilineData) {
             throw Error(`found existing data for tag: ${dataTag}`);
         }
@@ -109,15 +109,15 @@ export class McpMultilineHandler extends McpMessageHandler {
     }
 
     private handleContinue(message: string): boolean {
-        let match = message.match(/^#\$#\* (\d+) content: (.*)$/);
+        const match = message.match(/^#\$#\* (\d+) content: (.*)$/);
         if (!match) {
             return false;
         }
 
-        let dataTag = match[1];
-        let data = match[2];
+        const dataTag = match[1];
+        const data = match[2];
 
-        let existingMultilineData = this.memory.find(x => x.getDataTag() === dataTag);
+        const existingMultilineData = this.memory.find(x => x.getDataTag() === dataTag);
         if (!existingMultilineData) {
             throw Error(`found no data for tag: ${dataTag}`);
         }
@@ -128,22 +128,22 @@ export class McpMultilineHandler extends McpMessageHandler {
     }
 
     private handleEnd(message: string): boolean {
-        let match = message.match(/^#\$#: (\d+)$/);
+        const match = message.match(/^#\$#: (\d+)$/);
         if (!match) {
             return false;
         }
 
-        let dataTag = match[1];
+        const dataTag = match[1];
 
-        let existingMultilineData = this.memory.find(x => x.getDataTag() === dataTag);
+        const existingMultilineData = this.memory.find(x => x.getDataTag() === dataTag);
         if (!existingMultilineData) {
             throw Error(`found no data for tag: ${dataTag}`);
         }
 
         existingMultilineData.finish();
 
-        let multilineData = existingMultilineData.getData();
-        let stateData = { reference: multilineData.reference,
+        const multilineData = existingMultilineData.getData();
+        const stateData = { reference: multilineData.reference,
             name: multilineData.name, lines: multilineData.lines };
         this.connectionStateChanger.changeState(ConnectionState.multilineResult, stateData);
 

@@ -1,12 +1,13 @@
 import { MCP_AUTH_KEY } from './constants';
 import { ConnectionState, ConnectionStateChanger, TelnetMessageSender } from '../interfaces';
 
-import { McpMessageHandler } from "./mcp-message-handler";
+import { McpMessageHandler } from './mcp-message-handler';
 
 class McpNegotiationMessageHandler extends McpMessageHandler {
     protected messagePattern = '';
     protected response = '';
-    protected onHandled = () => {};
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    protected onHandled = () => { };
 
     public handle(message: string): boolean {
         const regex = new RegExp(this.messagePattern, '');
@@ -16,7 +17,7 @@ class McpNegotiationMessageHandler extends McpMessageHandler {
             return false;
         }
 
-        let actualResponse = this.response.replace('%MATCH_1%', match[1]).replace('%MATCH_2%', match[2]);
+        const actualResponse = this.response.replace('%MATCH_1%', match[1]).replace('%MATCH_2%', match[2]);
         this.sendMcpMessage(actualResponse);
 
         this.onHandled();

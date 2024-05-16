@@ -2,10 +2,10 @@ import { readFileSync } from 'fs';
 import { parse } from 'yaml';
 
 class ServerCredentials {
-    public serverAddress: string = '';
-    public serverPort: number = 0;
-    public serverUsername: string = '';
-    public serverPassword: string = '';
+    public serverAddress = '';
+    public serverPort = 0;
+    public serverUsername = '';
+    public serverPassword = '';
 }
 
 export function getServerCredentials(): ServerCredentials {

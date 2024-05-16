@@ -20,10 +20,11 @@
     "rebuild": "npm run clean:out && npm run build",
     "build": "npx tsc",
     "test-with-coverage": "npx nyc mocha --config .mocharc.prod.json",
+    "test:mocha:prod": "npx mocha --config .mocharc.prod.json",
     "test:mocha": "npx mocha",
     "lint": "npm run lint:fix",
-    "lint:check": "npx eslint",
-    "lint:fix": "npx eslint --fix",
+    "lint:check": "npx eslint .",
+    "lint:fix": "npx eslint --fix .",
     "version:minor": "npm version minor && git tag && git push --tags origin HEAD:main"
   },
   "dependencies": {
@@ -38,7 +39,6 @@
     "@types/chai-as-promised": "^7.1.8",
     "@types/mocha": "latest",
     "@types/node": "^20.12.11",
-    "@types/sinon": "^17.0.3",
     "@typescript-eslint/eslint-plugin": "^7.8.0",
     "@typescript-eslint/parser": "^7.8.0",
     "chai": "^4.4.1",
@@ -47,8 +47,7 @@
     "mocha": "^10.4.0",
     "nyc": "^15.1.0",
     "rimraf": "^5.0.5",
-    "sinon": "^17.0.2",
-    "source-map-support": "^0.5.21",
+    "ts-mockito": "^2.6.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5",
     "typescript-eslint": "^7.8.0"

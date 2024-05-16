@@ -1,5 +1,5 @@
-import { ConnectionStateChanger, MessageHandler, TelnetMessageSender } from "../interfaces";
-import { McpMultilineHandler } from "./mcp-multiline";
+import { ConnectionStateChanger, MessageHandler, TelnetMessageSender } from '../interfaces';
+import { McpMultilineHandler } from './mcp-multiline';
 
 import {
     McpNegotiateStartHandler,
@@ -7,7 +7,7 @@ import {
     McpNegotiationEndHandler,
     McpNegotiationNegotiateHandler,
     McpNegotiationSimpleEditHandler
-} from "./mcp-negotiate";
+} from './mcp-negotiate';
 
 export function getMessageHandlers(
     telnetMessageSender: TelnetMessageSender,
