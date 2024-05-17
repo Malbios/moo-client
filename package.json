@@ -1,6 +1,6 @@
 {
   "name": "moo-client-ts",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "A utility client for MOO servers written in TypeScript",
   "keywords": [
     "MOO",
@@ -25,7 +25,7 @@
     "lint:check": "npx eslint .",
     "lint:fix": "npx eslint --fix .",
     "prepare:output": "copyfiles -u 2 dist/src/**/* dist/lib && rimraf dist/src && copyfiles package.json dist && copyfiles README.md dist && copyfiles LICENSE dist",
-    "push:version": "git add * && git commit -m \"version incremented\" && git push && git push --tags origin HEAD:dev",
+    "push:version": "git push --tags origin HEAD:dev",
     "version:major": "npm version major && npm run push:version",
     "version:minor": "npm version minor && npm run push:version",
     "version:patch": "npm version patch && npm run push:version"
