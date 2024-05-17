@@ -3,4 +3,5 @@ dist/
 out/
 .nyc_output/
 reports/
+.vscode-test/
 *.tgz
