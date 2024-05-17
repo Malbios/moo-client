@@ -1,8 +1,7 @@
-name: Publish Node.js Package
+name: Debug test
 
 on:
-  release:
-    types: [created]
+  workflow_dispatch
 
 jobs:
   publish-npm:
@@ -14,14 +13,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: dev
+
       - uses: actions/setup-node@v4
         with:
           node-version: "20.x"
           registry-url: https://registry.npmjs.org/
+
       - run: npm ci
+
       - run: npm run rebuild:release
+
       - run: |
+          ls
           cd ./dist
-          npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+          ls
