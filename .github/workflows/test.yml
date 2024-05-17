@@ -32,3 +32,5 @@ jobs:
       - run: |
           cd ./dist
           ls
+          cd ./lib
+          ls
