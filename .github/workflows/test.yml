@@ -25,7 +25,10 @@ jobs:
 
       - run: npm run rebuild:release
 
+      - name: Prepare output for publishing
+        shell: pwsh
+        run: .\prepare-output.ps1
+
       - run: |
-          ls
           cd ./dist
           ls

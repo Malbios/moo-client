@@ -41,6 +41,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build
+      - name: Check package version vs npmjs.com
         shell: pwsh
         run: .\version-check.ps1
