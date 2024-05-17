@@ -1,5 +1,5 @@
 # moo-client-ts
-![automated-checks-badge](https://github.com/Malbios/moo-client-ts/actions/workflows/pull-request-on-main.yml/badge.svg)
+![automated-checks-badge](https://github.com/Malbios/moo-client-ts/actions/workflows/update-badges-on-main.yml/badge.svg)
 ![code-coverage-badge](https://malbios.github.io/moo-client-ts/coverage-badge.svg)
 
 This can be used to get (and eventually set) verb code in a MOO.
