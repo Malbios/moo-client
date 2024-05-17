@@ -20,6 +20,10 @@ jobs:
           node-version: '20.x'
 
       - run: npm ci
+
+      - run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
       
       - run: npm run deploy:prod
         env:
