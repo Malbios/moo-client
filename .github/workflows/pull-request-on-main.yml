@@ -43,7 +43,7 @@ jobs:
         with:
           token: ${{ secrets.PERSONAL_TOKEN }}
 
-      - name: Ensure newer version that last release
+      - name: Ensure newer version than last release
         shell: pwsh
         run: .\version-check.ps1
         env:
