@@ -1,0 +1,21 @@
+name: Automated Checks
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, edited, synchronize]
+
+jobs:
+  lint:
+    uses: ./.github/workflows/action_check-lint.yml
+  
+  unit-tests:
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
+    uses: ./.github/workflows/action_check-tests.yml
+  
+  check-version:
+    uses: ./.github/workflows/action_check-version.yml

@@ -14,7 +14,6 @@
   "main": "dist/index",
   "types": "dist/index.d.ts",
   "scripts": {
-    "deploy:prod": "npm run rebuild:release && npm run version:minor && npm publish --provenance --access public",
     "test": "npm run test:mocha",
     "clean:out": "rimraf ./dist",
     "rebuild:release": "npm run clean:out && npm run build:release",
@@ -25,7 +24,7 @@
     "lint": "npm run lint:fix",
     "lint:check": "npx eslint .",
     "lint:fix": "npx eslint --fix .",
-    "version:minor": "npm version minor && git tag && git push --tags origin HEAD:main"
+    "version:minor": "npm version minor && git tag && git push --tags origin HEAD:dev"
   },
   "dependencies": {
     "net": "^1.0.2",
