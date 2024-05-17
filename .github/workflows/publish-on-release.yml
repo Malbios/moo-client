@@ -22,6 +22,7 @@ jobs:
       - run: npm run rebuild:release
       - run: |
           cd ./dist
+          ls ./lib
           npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
