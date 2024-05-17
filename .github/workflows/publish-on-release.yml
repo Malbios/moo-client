@@ -14,8 +14,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      
-      - run: git checkout main
+
+      - name: Show current folder content
+        run: ls
 
       - uses: actions/setup-node@v4
         with:
