@@ -1,14 +1,14 @@
 <svg width="182" height="20" viewBox="0 0 1820 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Code Coverage (dev): 78.98%">
   <title>Code Coverage (dev): 78.98%</title>
-  <linearGradient id="xtbOO" x2="0" y2="100%">
+  <linearGradient id="EZPdP" x2="0" y2="100%">
     <stop offset="0" stop-opacity=".1" stop-color="#EEE"/>
     <stop offset="1" stop-opacity=".1"/>
   </linearGradient>
-  <mask id="vKjlW"><rect width="1820" height="200" rx="30" fill="#FFF"/></mask>
-  <g mask="url(#vKjlW)">
+  <mask id="obTDw"><rect width="1820" height="200" rx="30" fill="#FFF"/></mask>
+  <g mask="url(#obTDw)">
     <rect width="1280" height="200" fill="#555"/>
     <rect width="540" height="200" fill="#cba317" x="1280"/>
-    <rect width="1820" height="200" fill="url(#xtbOO)"/>
+    <rect width="1820" height="200" fill="url(#EZPdP)"/>
   </g>
   <g aria-hidden="true" fill="#fff" text-anchor="start" font-family="Verdana,DejaVu Sans,sans-serif" font-size="110">
     <text x="60" y="148" textLength="1180" fill="#000" opacity="0.25">Code Coverage (dev)</text>
