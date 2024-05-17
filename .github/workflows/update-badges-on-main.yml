@@ -1,9 +1,14 @@
-name: Run tests with code coverage
+name: Automated checks (main)
 
-on: workflow_call
+on:
+  push:
+    branches: [main]
 
 jobs:
-  main-job:
+  lint:
+    uses: ./.github/workflows/action_check-lint.yml
+
+  unit-tests:
     runs-on: ubuntu-latest
 
     environment:
@@ -15,7 +20,7 @@ jobs:
       id-token: write
 
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-test
+      group: ${{ github.workflow }}-${{ github.ref }}-badges
       cancel-in-progress: true
 
     steps:
