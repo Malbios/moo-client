@@ -27,7 +27,7 @@
     "lint:fix": "npx eslint --fix .",
     "prepare:output": "npm run move:files && rimraf dist/src",
     "move:files": "copyfiles -u 2 dist/src/**/* dist/lib && copyfiles package.json dist && copyfiles README.md dist && copyfiles LICENSE dist",
-    "version:minor": "npm version minor && git tag && git push --tags origin HEAD:dev"
+    "version:minor": "npm version minor && git push --tags origin HEAD:dev"
   },
   "dependencies": {
     "net": "^1.0.2",
