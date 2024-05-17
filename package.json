@@ -1,6 +1,6 @@
 {
   "name": "moo-client-ts",
-  "version": "0.8.7",
+  "version": "0.9.0",
   "description": "A utility client for MOO servers written in TypeScript",
   "keywords": [
     "MOO",
