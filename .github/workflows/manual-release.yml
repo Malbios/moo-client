@@ -2,11 +2,11 @@ name: Manual Release (main)
 
 on:
   workflow_dispatch
-  
+
 jobs:
   release:
     permissions:
       contents: write
       id-token: write
     
-    uses: ./.github/workflows/publish-package.yml
+    uses: ./.github/workflows/action_publish-package.yml
