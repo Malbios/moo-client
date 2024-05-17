@@ -40,7 +40,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PERSONAL_TOKEN }}
 
       - name: Ensure newer version that last release
         shell: pwsh
         run: .\version-check.ps1
+        env:
+          GH_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
