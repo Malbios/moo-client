@@ -1,11 +1,13 @@
 .github
-.vscode/
-.nyc_output/
-reports/
-tests/
+.vscode
+.nyc_output
+reports
+tests
+src
 .gitattributes
 .gitignore
 .mocharc.json
+.mocharc.prod.json
 .nycrc.json
 eslint.config.mjs
 tsconfig.json
