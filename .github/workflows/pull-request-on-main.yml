@@ -31,7 +31,7 @@ jobs:
       - name: Run tests with coverage
         run: npm run test:mocha:prod
   
-  check-version:
+  ensure-new-version:
     runs-on: ubuntu-latest
 
     concurrency:
@@ -41,6 +41,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check package version vs npmjs.com
+      - name: Ensure newer version that last release
         shell: pwsh
         run: .\version-check.ps1
