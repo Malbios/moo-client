@@ -3,7 +3,7 @@ import { suite, test } from 'mocha';
 import { expect } from 'chai';
 import { mock as createMock, instance, when, verify } from 'ts-mockito';
 
-import MooClient from '../src/index';
+import { MooClient } from '../src/index';
 import { ConnectionState, ErrorCode, TelnetClient as ITelnetClient } from '../src/telnet/interfaces';
 
 suite('MooClient unit tests', () => {

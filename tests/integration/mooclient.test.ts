@@ -1,7 +1,7 @@
 import { fail } from 'assert';
 import { expect } from 'chai';
 
-import MooClient from '../../src/index';
+import { MooClient } from '../../src/index';
 import { getServerCredentials } from '../test-utils/secrets';
 
 function getDefaultMooClient(): MooClient {
