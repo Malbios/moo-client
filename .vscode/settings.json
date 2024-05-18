@@ -4,10 +4,14 @@
         ".nyc_output": true,
         "package-lock.json": true
     },
-    "editor.codeActionsOnSave": {
-        "source.fixAll": "explicit"
-    },
     "editor.folding": false,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit"
+    },
+    "editor.insertSpaces": false,
+    "typescript.tsc.autoDetect": "off",
+    "typescript.preferences.quoteStyle": "single",
+    "typescript.updateImportsOnFileMove.enabled": "always",
     "editor.formatOnSave": true,
     "editor.formatOnPaste": true,
     "eslint.validate": [
@@ -20,7 +24,6 @@
     "eslint.options": {
         "overrideConfigFile": "eslint.config.mjs"
     },
-    "typescript.updateImportsOnFileMove.enabled": "always",
     "[github-actions-workflow]": {
         "editor.tabSize": 2
     },

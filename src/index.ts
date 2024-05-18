@@ -4,14 +4,16 @@ import {
     ErrorStateData,
     VerbCodeStateData
 } from './telnet/interfaces';
-import { VerbData } from './models';
 import { TelnetClient } from './telnet/telnet-client';
+
+import { MooClient as IMooClient } from './interfaces';
+import { VerbData } from './models';
 
 function delay(milliseconds: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, milliseconds));
 }
 
-export default class MooClient {
+export class MooClient implements IMooClient {
     private telnetClient;
 
     private serverAddress: string;
@@ -86,7 +88,7 @@ export default class MooClient {
         }
 
         if (!verbData) {
-            return new VerbData('', '', []);
+            throw Error('unexpected state, did not find verb data');
         }
 
         return verbData;
