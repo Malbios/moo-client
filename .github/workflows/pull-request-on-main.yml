@@ -41,10 +41,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          submodules: true
           token: ${{ secrets.PERSONAL_TOKEN }}
 
       - name: Ensure newer version than last release
         shell: pwsh
-        run: .\version-check.ps1
+        run: Import-Module './scripts/common'; EnsureNewVersion
+        env:
+          GH_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+
+      - name: Ensure latest version tag points to latest commit
+        shell: pwsh
+        run: Import-Module './scripts/common'; EnsureLatestVersionTagPointsToLatestCommit
         env:
           GH_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
