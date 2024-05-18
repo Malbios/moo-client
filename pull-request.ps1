@@ -7,3 +7,5 @@ if (!$pullRequest) {
 }
 
 Write-Host "Url: $($pullRequest.url)"
+
+gh merge --auth $pullRequest
