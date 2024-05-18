@@ -47,9 +47,7 @@ jobs:
           cd repo
           npm run test-with-coverage
 
-      - run: |
-          cd repo
-          npm i coverage-badges-cli -g
+      - run: npm i coverage-badges-cli -g
       - run: |
           cd repo
           npx coverage-badges --source reports/coverage-summary.json --output ./../gh-pages/coverage-badge.svg --label="Code Coverage"
