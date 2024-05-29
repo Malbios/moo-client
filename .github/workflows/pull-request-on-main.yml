@@ -44,9 +44,11 @@ jobs:
           submodules: true
           token: ${{ secrets.PERSONAL_TOKEN }}
 
-      - name: Trust PSGallery
+      - name: Trust PSGallery and install requirements
         shell: pwsh
-        run: Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+        run: |
+          Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+          Install-Module PowerShellForGitHub
 
       - name: Ensure newer version than last release
         env:

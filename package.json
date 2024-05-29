@@ -47,6 +47,7 @@
     "test-with-coverage": "npx nyc mocha --config .mocharc.release.json",
     "test:mocha:release": "npx mocha --config .mocharc.release.json",
     "test:mocha": "npx mocha",
+    "test:custom": "npx mocha -g \"MooClient integration tests for\"",
     "lint": "npm run lint:fix",
     "lint:check": "npx eslint .",
     "lint:fix": "npx eslint --fix .",

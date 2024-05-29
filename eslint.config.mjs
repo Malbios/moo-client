@@ -14,8 +14,9 @@ export default [
       }
     },
     rules: {
-      'quotes': ['warn', 'single'],
-      '@typescript-eslint/no-unused-vars': 'warn'
+      '@typescript-eslint/no-unused-vars': 'warn',
+      quotes: ['warn', 'single'],
+      semi: ['error', 'always']
     }
   },
   {

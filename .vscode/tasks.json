@@ -14,6 +14,20 @@
 			"problemMatcher": [],
 			"label": "npm: test",
 			"detail": "npm run test:mocha"
+		},
+		{
+			"presentation": {
+				"clear": true,
+				"showReuseMessage": false,
+				"reveal": "silent",
+				"revealProblems": "onProblem"
+			},
+			"type": "npm",
+			"script": "test:custom",
+			"group": "test",
+			"problemMatcher": [],
+			"label": "npm: test:custom",
+			"detail": "mocha -g <test-name(s)>"
 		}
 	]
 }
