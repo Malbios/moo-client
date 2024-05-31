@@ -39,6 +39,6 @@
     "mochaExplorer.exit": true,
     "mochaExplorer.globImplementation": "vscode",
     "mochaExplorer.ui": "tdd",
-    "mochaExplorer.configFile": ".mocharc.debugging.json",
+    "mochaExplorer.configFile": ".mocharc.json",
     "testExplorer.errorDecoration": false
 }

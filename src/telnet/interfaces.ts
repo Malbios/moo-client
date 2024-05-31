@@ -1,9 +1,9 @@
 import { Socket } from 'net';
 
 export interface TelnetClient {
-    changeState(newState: ConnectionState, stateData?: ErrorStateData | VerbCodeStateData): void;
+    changeState(newState: ConnectionState, stateData?: ErrorStateData | MultilineResultStateData): void;
     getState(): ConnectionState;
-    getStateData(): undefined | ErrorStateData | VerbCodeStateData;
+    getStateData(): undefined | ErrorStateData | MultilineResultStateData;
     enableDebugLogging(): void;
     send(message: string): void;
     connect(ipAddress: string, port: number, user: string, password: string): void;
@@ -45,7 +45,7 @@ export interface TelnetMessageSender {
 }
 
 export interface ConnectionStateChanger {
-    changeState(newState: ConnectionState, data?: ErrorStateData | VerbCodeStateData): void;
+    changeState(newState: ConnectionState, data?: ErrorStateData | MultilineResultStateData): void;
 }
 
 export interface MessageHandler {
@@ -57,14 +57,16 @@ export interface ErrorStateData {
     message: string;
 }
 
-export interface VerbCodeStateData {
+export interface MultilineResultStateData {
     reference: string;
     name: string;
+    type: string;
     lines: string[];
 }
 
 export enum ConnectionState {
     undefined,
+    connecting,
     connected,
     multilineResult,
     error

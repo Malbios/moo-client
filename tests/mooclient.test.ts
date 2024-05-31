@@ -1,9 +1,9 @@
-import { fail } from 'assert';
-import { suite, test } from 'mocha';
 import { expect } from 'chai';
-import { mock as createMock, instance, when, verify } from 'ts-mockito';
+import { suite, test } from 'mocha';
+import { mock as createMock, instance, verify, when } from 'ts-mockito';
 
 import { MooClient } from '../src/index';
+import { VerbData } from '../src/interfaces';
 import { ConnectionState, ErrorCode, TelnetClient as ITelnetClient } from '../src/telnet/interfaces';
 
 suite('MooClient unit tests', () => {
@@ -22,28 +22,35 @@ suite('MooClient unit tests', () => {
         const mockedTelnetClient = createMock<ITelnetClient>();
 
         when(mockedTelnetClient.getState())
-            .thenReturn(ConnectionState.undefined)
+            .thenReturn(ConnectionState.connecting)
             .thenReturn(ConnectionState.connected)
-            .thenReturn(ConnectionState.undefined)
+            .thenReturn(ConnectionState.connected)
+            .thenReturn(ConnectionState.connected)
+            .thenReturn(ConnectionState.multilineResult)
             .thenReturn(ConnectionState.multilineResult);
 
         when(mockedTelnetClient.getStateData())
-            .thenReturn({ reference: expectedReference, name: expectedName, lines: expectedCode });
+            .thenReturn({ reference: expectedReference, name: expectedName, type: 'moo-code', lines: expectedCode });
 
         const mockedTelnetClientInstance = instance(mockedTelnetClient);
 
         const client = MooClient.create('server', 123, 'user', 'pass', mockedTelnetClientInstance);
+
+        await client.connect();
+
         const result = await client.getVerbData('me', 'test');
 
         verify(mockedTelnetClient.connect('server', 123, 'user', 'pass')).called();
         verify(mockedTelnetClient.send('@edit me:test')).called();
 
-        expect(result.reference).to.equal(expectedReference);
-        expect(result.name).to.equal(expectedName);
-        expect(result.code).to.have.length(expectedCode.length);
+        const verbData = result as VerbData;
+
+        expect(verbData.reference).to.equal(expectedReference);
+        expect(verbData.name).to.equal(expectedName);
+        expect(verbData.code).to.have.length(expectedCode.length);
 
         for (let i = 0; i < expectedCode.length; i++) {
-            expect(result.code[i]).to.equal(expectedCode[i]);
+            expect(verbData.code[i]).to.equal(expectedCode[i]);
         }
     });
 
@@ -51,9 +58,10 @@ suite('MooClient unit tests', () => {
         const mockedTelnetClient = createMock<ITelnetClient>();
 
         when(mockedTelnetClient.getState())
-            .thenReturn(ConnectionState.undefined)
+            .thenReturn(ConnectionState.connecting)
             .thenReturn(ConnectionState.connected)
-            .thenReturn(ConnectionState.undefined)
+            .thenReturn(ConnectionState.connected)
+            .thenReturn(ConnectionState.connected)
             .thenReturn(ConnectionState.error);
 
         when(mockedTelnetClient.getStateData())
@@ -63,13 +71,12 @@ suite('MooClient unit tests', () => {
 
         const client = MooClient.create('server', 123, 'user', 'pass', mockedTelnetClientInstance);
 
-        try {
-            await client.getVerbData('me', 'DefinitelyDoesNotExist');
-            fail();
-        } catch (exception) {
-            const error = exception as Error;
-            expect(error.message).to.equal('That object does not define that verb.');
-        }
+        await client.connect();
+
+        const result = await client.getVerbData('me', 'DefinitelyDoesNotExist');
+
+        const error = result as Error;
+        expect(error.message).to.contain('That object does not define that verb');
 
         verify(mockedTelnetClient.connect('server', 123, 'user', 'pass')).called();
         verify(mockedTelnetClient.send('@edit me:DefinitelyDoesNotExist')).called();
@@ -79,9 +86,10 @@ suite('MooClient unit tests', () => {
         const mockedTelnetClient = createMock<ITelnetClient>();
 
         when(mockedTelnetClient.getState())
-            .thenReturn(ConnectionState.undefined)
+            .thenReturn(ConnectionState.connecting)
             .thenReturn(ConnectionState.connected)
-            .thenReturn(ConnectionState.undefined)
+            .thenReturn(ConnectionState.connected)
+            .thenReturn(ConnectionState.connected)
             .thenReturn(ConnectionState.error);
 
         when(mockedTelnetClient.getStateData())
@@ -91,13 +99,12 @@ suite('MooClient unit tests', () => {
 
         const client = MooClient.create('server', 123, 'user', 'pass', mockedTelnetClientInstance);
 
-        try {
-            await client.getVerbData('DoesNotExist', 'test');
-            fail();
-        } catch (exception) {
-            const error = exception as Error;
-            expect(error.message).to.equal('I see no "DoesNotExist" here.');
-        }
+        await client.connect();
+
+        const result = await client.getVerbData('DoesNotExist', 'test');
+
+        const error = result as Error;
+        expect(error.message).to.contain('I see no "DoesNotExist" here');
 
         verify(mockedTelnetClient.connect('server', 123, 'user', 'pass')).called();
         verify(mockedTelnetClient.send('@edit DoesNotExist:test')).called();

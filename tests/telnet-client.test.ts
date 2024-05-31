@@ -1,11 +1,11 @@
-import { suite, test } from 'mocha';
 import { fail } from 'assert';
 import { expect } from 'chai';
-import { mock as createMock, instance, when, verify, anything } from 'ts-mockito';
+import { suite, test } from 'mocha';
+import { anything, mock as createMock, instance, verify, when } from 'ts-mockito';
 
-import { ConnectionState, TelnetSocket as ITelnetSocket, VerbCodeStateData } from '../src/telnet/interfaces';
-import { TelnetClient } from '../src/telnet/telnet-client';
+import { ConnectionState, TelnetSocket as ITelnetSocket, MultilineResultStateData } from '../src/telnet/interfaces';
 import { MCP_AUTH_KEY } from '../src/telnet/mcp/constants';
+import { TelnetClient } from '../src/telnet/telnet-client';
 
 /*
     on(name: 'command', callback: (command: number) => void): void;
@@ -106,7 +106,7 @@ suite('TelnetClient unit tests', () => {
 
         expect(client.getState()).to.equal(ConnectionState.multilineResult);
 
-        const stateData = client.getStateData() as VerbCodeStateData;
+        const stateData = client.getStateData() as MultilineResultStateData;
 
         expect(stateData.reference).to.equal('x');
         expect(stateData.name).to.equal('y');

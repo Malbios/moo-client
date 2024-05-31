@@ -2,24 +2,24 @@ import { Socket } from 'net';
 import { TelnetSocket } from 'telnet-stream';
 
 import {
+    ConnectionState,
+    ConnectionStateChanger,
+    ErrorStateData,
     TelnetClient as ITelnetClient,
     TelnetSocket as ITelnetSocket,
-    TelnetMessageSender,
-    ConnectionStateChanger,
-    ConnectionState,
-    ErrorStateData,
-    VerbCodeStateData
+    MultilineResultStateData,
+    TelnetMessageSender
 } from './interfaces';
 
-import { getMessageHandlers as getMcpMessageHandlers } from './mcp/mcp';
 import { getMessageHandlers as getCommonMessageHandlers } from './errors/handlers';
+import { getMessageHandlers as getMcpMessageHandlers } from './mcp/mcp';
 
 export class TelnetClient implements ITelnetClient, TelnetMessageSender, ConnectionStateChanger {
     private telnetSocket: ITelnetSocket;
 
     private logging = false;
     private state: ConnectionState = ConnectionState.undefined;
-    private stateData: undefined | ErrorStateData | VerbCodeStateData;
+    private stateData: undefined | ErrorStateData | MultilineResultStateData;
 
     private messageHandlers = getCommonMessageHandlers(this).concat(getMcpMessageHandlers(this, this));
 
@@ -35,7 +35,7 @@ export class TelnetClient implements ITelnetClient, TelnetMessageSender, Connect
         return new TelnetClient(telnetSocket);
     }
 
-    public changeState(newState: ConnectionState, stateData?: ErrorStateData | VerbCodeStateData): void {
+    public changeState(newState: ConnectionState, stateData?: ErrorStateData | MultilineResultStateData): void {
         this.state = newState;
 
         if (stateData) {
@@ -47,7 +47,7 @@ export class TelnetClient implements ITelnetClient, TelnetMessageSender, Connect
         return this.state;
     }
 
-    public getStateData(): undefined | ErrorStateData | VerbCodeStateData {
+    public getStateData(): undefined | ErrorStateData | MultilineResultStateData {
         return this.stateData;
     }
 
@@ -67,6 +67,8 @@ export class TelnetClient implements ITelnetClient, TelnetMessageSender, Connect
     }
 
     public connect(ipAddress: string, port: number, user: string, password: string) {
+        this.changeState(ConnectionState.connecting);
+
         this.telnetSocket.on('connect', () => {
             this.log('Connected!');
             this.send(`co ${user} ${password}`);
@@ -75,6 +77,7 @@ export class TelnetClient implements ITelnetClient, TelnetMessageSender, Connect
         this.telnetSocket.on('close', () => {
             this.log('Connection closed!');
             this.telnetSocket.destroy();
+            this.changeState(ConnectionState.undefined);
         });
 
         this.telnetSocket.on('error', error => {
@@ -137,11 +140,11 @@ export class TelnetClient implements ITelnetClient, TelnetMessageSender, Connect
 
         this.telnetSocket.on('lookup', () => {
             this.log('<LOOKUP');
-        })
+        });
 
         this.telnetSocket.on('timeout', () => {
             this.log('<TIMEOUT');
-        })
+        });
 
         this.telnetSocket.on('data', async buffer => {
             const data = buffer.toString('utf8');
