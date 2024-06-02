@@ -1,8 +1,4 @@
-export interface VerbData {
-    reference: string;
-    name: string;
-    code: string[];
-}
+import { ErrorStateData, MultilineResult } from './telnet/interfaces';
 
 export interface BuiltinFunctionData {
     name: string;
@@ -10,5 +6,11 @@ export interface BuiltinFunctionData {
 }
 
 export interface MooClient {
-    getVerbData(object: string, verb: string): Promise<VerbData | Error>;
+    connect(): Promise<null | ErrorStateData>;
+    disconnect(): Promise<null | ErrorStateData>;
+
+    eval(command: string): Promise<MultilineResult | ErrorStateData>;
+
+    getVerbCode(object: string, verb: string): Promise<string[] | ErrorStateData>;
+    getBuiltinFunctionsDocumentation(): Promise<BuiltinFunctionData[] | ErrorStateData>;
 }

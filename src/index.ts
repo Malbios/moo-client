@@ -1,12 +1,14 @@
 import {
     ConnectionState,
+    ErrorCode,
     ErrorStateData,
     TelnetClient as ITelnetClient,
-    MultilineResultStateData
+    MultilineResult,
+    isErrorStateData
 } from './telnet/interfaces';
 import { TelnetClient } from './telnet/telnet-client';
 
-import { BuiltinFunctionData, MooClient as IMooClient, VerbData } from './interfaces';
+import { BuiltinFunctionData, MooClient as IMooClient } from './interfaces';
 
 function delay(milliseconds: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, milliseconds));
@@ -43,7 +45,7 @@ export class MooClient implements IMooClient {
         this.telnetClient.enableDebugLogging();
     }
 
-    public async connect() {
+    public async connect(): Promise<null | ErrorStateData> {
         this.telnetClient.connect(this.serverAddress, this.serverPort, this.user, this.password);
 
         while (this.telnetClient.getState() == ConnectionState.connecting) {
@@ -51,51 +53,52 @@ export class MooClient implements IMooClient {
         }
 
         if (this.telnetClient.getState() == ConnectionState.error) {
-            throw Error('could not connect');
+            return { code: ErrorCode.generic, message: 'could not connect' };
         }
+
+        return null;
     }
 
-    public disconnect() {
+    public async disconnect(): Promise<null | ErrorStateData> {
         this.telnetClient.send('@quit');
-    }
-
-    private async getMultilineResult(command: string): Promise<MultilineResultStateData | Error> {
-        if (this.telnetClient.getState() != ConnectionState.connected) {
-            return new Error('client is not connected');
-        }
-
-        this.telnetClient.send(command);
 
         while (this.telnetClient.getState() == ConnectionState.connected) {
             await delay(1);
         }
 
-        if (this.telnetClient.getState() != ConnectionState.multilineResult) {
-            if (this.telnetClient.getState() == ConnectionState.error) {
-                const stateData = this.telnetClient.getStateData() as ErrorStateData;
-                if (!stateData) {
-                    return new Error('unexpected error state with no data');
-                }
-
-                return Error(stateData.message);
-            }
-
-            return new Error('unexpected client state');
+        if (this.telnetClient.getState() == ConnectionState.error) {
+            return this.getErrorStateData();
         }
 
-        const stateData = this.telnetClient.getStateData() as MultilineResultStateData;
-        if (!stateData) {
-            return new Error('unexpected multiline result state with no data');
+        if (this.telnetClient.getState() != ConnectionState.disconnected) {
+            return { code: ErrorCode.generic, message: `unexpected connection state: '${this.telnetClient.getState()}'` };
         }
+
+        return null;
+    }
+
+    public async eval(code: string): Promise<MultilineResult | ErrorStateData> {
+        const result = await this.getMultilineResult(`;;me:mcp_eval("${code}");`);
 
         this.telnetClient.changeState(ConnectionState.connected);
 
-        return stateData;
+        return result;
     }
 
-    public async getBuiltinFunctionsData(): Promise<BuiltinFunctionData[] | Error> {
-        const helpDatabases = await this.getMultilineResult(';me:mcp_eval("return $help:index_list();");');
-        if (helpDatabases instanceof Error) {
+    public async getVerbCode(object: string, verb: string): Promise<string[] | ErrorStateData> {
+        const command = `return verb_code(${object}, \\"${verb}\\");`;
+
+        const verbCodeData = await this.eval(command);
+        if (isErrorStateData(verbCodeData)) {
+            return verbCodeData;
+        }
+
+        return verbCodeData.lines;
+    }
+
+    public async getBuiltinFunctionsDocumentation(): Promise<BuiltinFunctionData[] | ErrorStateData> {
+        const helpDatabases = await this.eval('return $help:index_list();');
+        if (isErrorStateData(helpDatabases)) {
             return helpDatabases;
         }
 
@@ -109,19 +112,21 @@ export class MooClient implements IMooClient {
         }
 
         if (bf_help_db_object_id === '') {
-            throw Error('could not find builtin-index help object');
+            return { code: ErrorCode.generic, message: 'could not find builtin-index help object' };
         }
 
-        const bfFunctions = await this.getMultilineResult(`;me:mcp_eval("return ${bf_help_db_object_id}:find_topics();");`);
-        if (bfFunctions instanceof Error) {
+        const bfFunctions = await this.eval(`return ${bf_help_db_object_id}:find_topics();`);
+        if (isErrorStateData(bfFunctions)) {
             return bfFunctions;
         }
 
         const bfData: BuiltinFunctionData[] = [];
 
         for (const line of bfFunctions.lines) {
-            const functionDocumentation = await this.getMultilineResult(`;me:mcp_eval("return ${bf_help_db_object_id}:get_topic(\\"${line}\\");");`);
-            if (functionDocumentation instanceof Error) {
+            // console.log('requesting info for: ' + line);
+
+            const functionDocumentation = await this.eval(`return ${bf_help_db_object_id}:get_topic(\\"${line}\\");`);
+            if (isErrorStateData(functionDocumentation)) {
                 return functionDocumentation;
             }
 
@@ -131,12 +136,45 @@ export class MooClient implements IMooClient {
         return bfData;
     }
 
-    public async getVerbData(object: string, verb: string): Promise<VerbData | Error> {
-        const verbCodeData = await this.getMultilineResult(`@edit ${object}:${verb}`);
-        if (verbCodeData instanceof Error) {
-            return verbCodeData;
+    private async getMultilineResult(command: string): Promise<MultilineResult | ErrorStateData> {
+        if (this.telnetClient.getState() != ConnectionState.connected) {
+            return { code: ErrorCode.generic, message: 'client is not connected' };
         }
 
-        return { reference: verbCodeData.reference, name: verbCodeData.name, code: verbCodeData.lines };
+        this.telnetClient.send(command);
+
+        while (this.telnetClient.getState() == ConnectionState.connected) {
+            await delay(1);
+        }
+
+        if (this.telnetClient.getState() == ConnectionState.error) {
+            return this.getErrorStateData();
+        }
+
+        if (this.telnetClient.getState() != ConnectionState.multilineResult) {
+            return { code: ErrorCode.generic, message: `unexpected connection state: '${this.telnetClient.getState()}'` };
+        }
+
+        const stateData = this.telnetClient.getStateData() as MultilineResult;
+        if (!stateData) {
+            return { code: ErrorCode.generic, message: 'unexpected multiline result state with no data' };
+        }
+
+        this.telnetClient.changeState(ConnectionState.connected);
+
+        return stateData;
+    }
+
+    private getErrorStateData(): ErrorStateData {
+        if (this.telnetClient.getState() != ConnectionState.error) {
+            return { code: ErrorCode.generic, message: `unexpected connection state: '${this.telnetClient.getState()}'` };
+        }
+
+        const errorStateData = this.telnetClient.getStateData();
+        if (!isErrorStateData(errorStateData)) {
+            return { code: ErrorCode.generic, message: 'unexpected error state with no data' };
+        }
+
+        return errorStateData;
     }
 }

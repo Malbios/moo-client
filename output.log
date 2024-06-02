@@ -1,0 +1,12 @@
+
+> moo-client-ts@0.10.0 test:custom
+> npx mocha -g "should return info for all built-in functions"
+
+
+
+  MooClient integration tests for bf info
+    Ô£ö should return info for all built-in functions (5863ms)
+
+
+  1 passing (6s)
+
