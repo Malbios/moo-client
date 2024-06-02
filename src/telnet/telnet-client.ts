@@ -17,7 +17,6 @@ import {
 
 export class TelnetClient implements ITelnetClient, TelnetMessageSender, ConnectionStateChanger {
     private _telnetSocket: ITelnetSocket;
-    private _internalSocket: Socket | undefined;
 
     private _logging = false;
     private _state: ConnectionState = ConnectionState.undefined;
@@ -26,9 +25,8 @@ export class TelnetClient implements ITelnetClient, TelnetMessageSender, Connect
     private _data = '';
     private _dataHandlers: DataHandler[];
 
-    private constructor(telnetSocket: ITelnetSocket, internalSocket?: Socket) {
+    private constructor(telnetSocket: ITelnetSocket) {
         this._telnetSocket = telnetSocket;
-        this._internalSocket = internalSocket;
 
         this._dataHandlers = [new McpDataHandler(this, this), new ErrorHandler(this)];
     }
@@ -36,14 +34,9 @@ export class TelnetClient implements ITelnetClient, TelnetMessageSender, Connect
     public static create(telnetSocket?: ITelnetSocket): ITelnetClient {
         if (!telnetSocket) {
             const socket = new Socket();
-
-            socket.on('end', () => {
-                console.log('reached end');
-            });
-
             const telnetSocket = new TelnetSocket(socket);
 
-            return new TelnetClient(telnetSocket, socket);
+            return new TelnetClient(telnetSocket);
         }
 
         return new TelnetClient(telnetSocket);
@@ -98,7 +91,7 @@ export class TelnetClient implements ITelnetClient, TelnetMessageSender, Connect
 
             const stackLines = stack?.split('\n');
 
-            this.log('<ERROR:');
+            this.log('<TELNET ERROR:');
             this.log(`error-name: ${name}`);
             this.log(`error-message: ${message}`);
 
@@ -160,8 +153,17 @@ export class TelnetClient implements ITelnetClient, TelnetMessageSender, Connect
         this._telnetSocket.on('data', async buffer => {
             const data = buffer.toString('utf8');
 
+            const charCode = data[data.length - 1].charCodeAt(0);
+            if (charCode != 10) {
+                this._data += data;
+                return;
+            }
+
+            const fullData = this._data + data;
+            this._data = '';
+
             for (const handler of this._dataHandlers) {
-                handler.handle(data);
+                handler.handle(fullData);
             }
         });
 

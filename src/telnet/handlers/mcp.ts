@@ -28,7 +28,6 @@ export class McpDataHandler implements IDataHandler {
 	private _messageSender: TelnetMessageSender;
 	private _stateChanger: ConnectionStateChanger;
 
-	private _dataBuffer = '';
 	private _state = McpState.undefined;
 	private _simpleEditContents: SimpleEditContent[] = [];
 
@@ -55,7 +54,9 @@ export class McpDataHandler implements IDataHandler {
 			}
 
 			case McpState.negotiated: {
-				this.handleBuffered(sanitizedData);
+				this.simpleEditContentStart(sanitizedData);
+				this.simpleEditContentContinue(sanitizedData);
+				this.simpleEditContentFinish(sanitizedData);
 				break;
 			}
 
@@ -123,20 +124,6 @@ export class McpDataHandler implements IDataHandler {
 		this._state = McpState.negotiated;
 
 		this._stateChanger.changeState(ConnectionState.connected);
-	}
-
-	private handleBuffered(data: string) {
-		if (!data.endsWith('=> 0')) {
-			this._dataBuffer += data;
-			return;
-		}
-
-		const fullData = this._dataBuffer + data;
-		this._dataBuffer = '';
-
-		this.simpleEditContentStart(fullData);
-		this.simpleEditContentContinue(fullData);
-		this.simpleEditContentFinish(fullData);
 	}
 
 	private simpleEditContentStart(data: string) {
