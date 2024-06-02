@@ -4,4 +4,5 @@ out/
 .nyc_output/
 reports/
 .vscode-test/
+/tests/test-workspace/**/*
 *.tgz

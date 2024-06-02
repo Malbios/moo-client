@@ -1,3 +1,5 @@
+import { BuiltinFunctionData, MooClient as IMooClient } from './interfaces';
+import { init } from './moo/sync';
 import {
     ConnectionState,
     ErrorCode,
@@ -7,8 +9,6 @@ import {
     isErrorStateData
 } from './telnet/interfaces';
 import { TelnetClient } from './telnet/telnet-client';
-
-import { BuiltinFunctionData, MooClient as IMooClient } from './interfaces';
 
 function delay(milliseconds: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, milliseconds));
@@ -43,6 +43,10 @@ export class MooClient implements IMooClient {
 
     public enableDebugging() {
         this.telnetClient.enableDebugLogging();
+    }
+
+    public disableMcp() {
+        this.telnetClient.disableMcp();
     }
 
     public async connect(): Promise<null | ErrorStateData> {
@@ -85,6 +89,18 @@ export class MooClient implements IMooClient {
         return result;
     }
 
+    public async testEval(code: string): Promise<MultilineResult | ErrorStateData> {
+        const result = await this.getMultilineResult(`;;${code}`);
+
+        this.telnetClient.changeState(ConnectionState.connected);
+
+        return result;
+    }
+
+    public async initSync(folderPath: string) {
+        await init(folderPath, (x: string) => this.testEval(x));
+    }
+
     public async getVerbCode(object: string, verb: string): Promise<string[] | ErrorStateData> {
         const command = `return verb_code(${object}, \\"${verb}\\");`;
 
@@ -123,8 +139,6 @@ export class MooClient implements IMooClient {
         const bfData: BuiltinFunctionData[] = [];
 
         for (const line of bfFunctions.lines) {
-            // console.log('requesting info for: ' + line);
-
             const functionDocumentation = await this.eval(`return ${bf_help_db_object_id}:get_topic(\\"${line}\\");`);
             if (isErrorStateData(functionDocumentation)) {
                 return functionDocumentation;

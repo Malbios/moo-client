@@ -7,6 +7,7 @@ export interface TelnetClient {
     enableDebugLogging(): void;
     send(message: string): void;
     connect(ipAddress: string, port: number, user: string, password: string): void;
+    disableMcp(): void;
 }
 
 export interface TelnetSocket {

@@ -3,6 +3,7 @@ import { TelnetSocket } from 'telnet-stream';
 
 import { ErrorHandler } from './handlers/error';
 import { McpDataHandler } from './handlers/mcp';
+import { TestDataHandler } from './handlers/test';
 import {
     ConnectionState,
     ConnectionStateChanger,
@@ -28,7 +29,7 @@ export class TelnetClient implements ITelnetClient, TelnetMessageSender, Connect
     private constructor(telnetSocket: ITelnetSocket) {
         this._telnetSocket = telnetSocket;
 
-        this._dataHandlers = [new McpDataHandler(this, this), new ErrorHandler(this)];
+        this._dataHandlers = [new TestDataHandler(this), new McpDataHandler(this, this), new ErrorHandler(this)];
     }
 
     public static create(telnetSocket?: ITelnetSocket): ITelnetClient {
@@ -40,6 +41,11 @@ export class TelnetClient implements ITelnetClient, TelnetMessageSender, Connect
         }
 
         return new TelnetClient(telnetSocket);
+    }
+
+    public disableMcp() {
+        const index = this._dataHandlers.findIndex(x => x instanceof McpDataHandler);
+        this._dataHandlers.splice(index, 1);
     }
 
     public changeState(newState: ConnectionState, stateData?: ErrorStateData | MultilineResult): void {
@@ -75,6 +81,11 @@ export class TelnetClient implements ITelnetClient, TelnetMessageSender, Connect
 
         this._telnetSocket.on('connect', () => {
             this.log('Connected!');
+            if (password == '') {
+                this.send(`${user}`);
+                return;
+            }
+
             this.send(`co ${user} ${password}`);
         });
 
