@@ -99,6 +99,12 @@ export class MooClient implements IMooClient {
 
     public async initSync(folderPath: string) {
         await init(folderPath, (x: string) => this.testEval(x));
+
+        this.watch(folderPath);
+    }
+
+    public watch(folderPath: string) {
+        return;
     }
 
     public async getVerbCode(object: string, verb: string): Promise<string[] | ErrorStateData> {

@@ -1,5 +1,6 @@
 import fs from 'fs';
-import { ErrorStateData, MultilineResult, isErrorStateData } from '../telnet/interfaces';
+import yaml from 'yaml';
+import { ErrorStateData, MultilineResult } from '../telnet/interfaces';
 import { getAllObjects } from './parsing';
 
 export async function init(rootPath: string, evalAction: (x: string) => Promise<MultilineResult | ErrorStateData>) {
@@ -13,15 +14,14 @@ export async function init(rootPath: string, evalAction: (x: string) => Promise<
 	}
 
 	const objectInfos = await getAllObjects(evalAction);
-	if (isErrorStateData(objectInfos)) {
-		throw Error('could not get object infos');
-	}
 
 	for (const objectInfo of objectInfos) {
 		fs.mkdirSync(`${rootPath}/${objectInfo.id}`);
 
-		for (const verbInfo of objectInfo.verbs) {
-			fs.writeFileSync(`${rootPath}/${objectInfo.id}/${verbInfo.name}.moo`, verbInfo.code.join('\r\n'));
+		fs.writeFileSync(`${rootPath}/${objectInfo.id}/object.meta`, yaml.stringify(objectInfo.metadata));
+
+		for (const verbCode of objectInfo.verbCode) {
+			fs.writeFileSync(`${rootPath}/${objectInfo.id}/${verbCode.index}.moo`, verbCode.lines.join('\r\n'));
 		}
 	}
 }
